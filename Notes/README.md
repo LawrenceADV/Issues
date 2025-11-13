@@ -1,7 +1,7 @@
 # Slim Bootloader 如何從 C code 找到 Platform Specific Configure Data？
 ## 以 SPD Data 為例，會透過 CDATA_MEMORY_TAG 取得記憶體設定資料：
 ### 取得 Memory Configuration Data
-MEMORY_CFG_DATA *MemCfgData;MemCfgData = (MEMORY_CFG_DATA *)FindConfigDataByTag(CDATA_MEMORY_TAG);
+MEMORY_CFG_DATA *MemCfgData = (MEMORY_CFG_DATA *)FindConfigDataByTag(CDATA_MEMORY_TAG);
 
 ## Memory Configure Data 會依什麼條件取得？
 
