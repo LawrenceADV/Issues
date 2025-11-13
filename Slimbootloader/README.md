@@ -16,8 +16,8 @@ Platform\RaptorlakeBoardPkg\CfgData\CfgDataInt_Rplp_Rvp_Ddr5_SOM_6884A2.dlt
 
 ## Test Result
 
-![Test Result 1](Pics/2025-11-13_130353.JPG)
+![Test Result 1](/Pics/2025-11-13_130353.JPG)
 
-![Test Result 2](Pics/2025-11-13_130553.PNG)
+![Test Result 2](/Pics/2025-11-13_130553.PNG)
 
 
