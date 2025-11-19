@@ -6,24 +6,24 @@
 - [ ] EC porting
 - [ ] Firmware Update function 
 - [ ] Secyrity function
-+     [ ] Boot Guard
-+     [ ] Secure boot
-+     [ ] TPM porting
+-    [ ] Boot Guard
+-    [ ] Secure boot
+-    [ ] TPM porting
 - [x] ME XML setting
 - [x] USB function
 - [x] HDA function
-+     [x] Add verb table
+-    [x] Add verb table
 - [x] Display support
-+     [x] VBT setting
-+     [x] DDI1/2/3/4
-+     [ ] EDP/LVDS/DP/HDMI function
-+         [ ] CH7513 Panel Type
+-    [x] VBT setting
+-    [x] DDI1/2/3/4
+-    [ ] EDP/LVDS/DP/HDMI function
+-        [ ] CH7513 Panel Type
 - [ ] PCI Express function
-+     [ ] PCIe wake
+-    [ ] PCIe wake
 - [ ] Generic IO decode
-+     [ ] ESPI0
-+     [ ] ESPI1
+-    [ ] ESPI0
+-    [ ] ESPI1
 - [x] Debug Features
-+     [x] Serial console
-+     [x] POST code output
+-    [x] Serial console
+-    [x] POST code output
 
