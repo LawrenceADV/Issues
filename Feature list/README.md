@@ -6,21 +6,21 @@
 - [ ] EC porting
   + [ ] SCI
   + [ ] Enable COM1/COM2
-- [ ] Firmware Update function 
-- [ ] Secyrity function
+- [x] Firmware Update function 
+- [ ] Security function
   + [ ] Boot Guard
   + [ ] Secure boot
 - [x] ME XML setting
 - [x] USB function
-- [x] HDA function
+  + [ ] Port control
+  + [ ] OC# pin porting
+- [ ] HDA function
   + [x] Add verb table
 - [x] Display support
-  + [x] VBT setting
   + [x] DDI1/2/3
-  + [ ] EDP/LVDS/DP/HDMI function
+  + [ ] EDP/LVDS function
     + [ ] CH7513
 - [ ] PCI Express function
-  + [ ] PCIe wake
 - [ ] SATA
 - [ ] Generic IO decode
   + [ ] ESPI0
@@ -30,7 +30,12 @@
   + [x] Debug message
   + [x] Console Redirection
   + [x] Port 80 output
-
+  
 - [ ] Undefined
-  + [ ] EC SIO
-  + [ ] 
+  + [ ] EC SIO function
+  + [ ] SATA_LED#
+  + [ ] BEEP
+  + [ ] SMB_ALT
+  + [ ] WOL S3
+  + [ ] WOL S4
+  + [ ] WOL S5
