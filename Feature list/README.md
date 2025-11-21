@@ -12,20 +12,17 @@
   + [ ] Secure boot
 - [x] ME XML setting
 - [x] USB function
-  + [ ] Port control
   + [ ] OC# pin porting
 - [ ] HDA function
   + [x] Add verb table
 - [x] Display support
-  + [x] DDI1/2/3
-  + [ ] EDP/LVDS function
-    + [ ] CH7513
+  + [ ] CH7513
 - [ ] PCI Express function
-- [ ] SATA
+- [x] SATA
 - [ ] Generic IO decode
   + [ ] ESPI0
   + [ ] ESPI1
-    + [ ] IT8883
+  + [ ] IT8883
 - [x] Debug Features
   + [x] Debug message
   + [x] Console Redirection
