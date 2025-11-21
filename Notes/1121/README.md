@@ -1,9 +1,9 @@
 ### 11/21 meeting minutes
 1. 用 Slim.bat 環境變數設定
 1.1  使用 Windows command line 視窗 (Powershell X)
-      Step1  slim.bat
-      Step2  slim.bat -c
-      Step3  slim.bat -a
+    -  Step1  slim.bat
+    -  Step2  slim.bat -c
+    -  Step3  slim.bat -a
     
 1.2  如何自動判別 Visual studio 版本的方式，並帶入對應路徑?
     
