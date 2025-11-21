@@ -4,35 +4,36 @@
 - [x] BIOSString support
 - [x] SMBIOS support
 - [ ] EC porting
-  + [ ] SCI
-  + [ ] Enable COM1/COM2
+  + [ ] SCI/ASL
+  + [ ] SMB_ALT
+  + [ ] EC Logical device
+- [ ] Enable COM1/COM2
 - [x] Firmware Update function 
 - [ ] Security function
   + [ ] Boot Guard
   + [ ] Secure boot
-- [x] ME XML setting
+  + [ ] TPM setting
+- [ ] ME XML setting
+  + [ ] Non-Boot guard binary
+  + [ ] Boot guard binary
 - [x] USB function
   + [ ] OC# pin porting
 - [ ] HDA function
   + [x] Add verb table
 - [x] Display support
-  + [ ] CH7513
+  + [ ] CH7513 (minor)
 - [ ] PCI Express function
 - [x] SATA
 - [ ] Generic IO decode
   + [ ] ESPI0
-  + [ ] ESPI1
-  + [ ] IT8883
+  + [ ] ESPI1 (minor/saparate with ESPI0)
+  + [ ] IT8883 (minor)
 - [x] Debug Features
   + [x] Debug message
   + [x] Console Redirection
   + [x] Port 80 output
-  
-- [ ] Undefined
-  + [ ] EC SIO function
+- [ ] Power Management
+  + [ ] Wake on lan S5
+- [ ] Miscellaneous
   + [ ] SATA_LED#
   + [ ] BEEP
-  + [ ] SMB_ALT
-  + [ ] WOL S3
-  + [ ] WOL S4
-  + [ ] WOL S5
