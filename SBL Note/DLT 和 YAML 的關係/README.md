@@ -25,7 +25,7 @@ ActiveSmallCoreCount = 0x1<br>
 
 > UpdateFspConfig
 
-```
+```cpp
 Fspmcfg->ActiveCoreCount      = MemCfgData->ActiveCoreCount;
 Fspmcfg->ActiveSmallCoreCount = MemCfgData->ActiveSmallCoreCount;
 ```
@@ -36,7 +36,7 @@ Status = FspmSwitchStack ((VOID *)(UINTN)FspMemoryInit, (VOID *)FspmUpdPtr, (VOI
 ```
 
 > Cold Reset
-```
+```cpp
 if (Status == FSP_STATUS_RESET_REQUIRED_COLD){
             ResetSystem(EfiResetCold);
 }

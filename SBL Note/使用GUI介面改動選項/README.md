@@ -34,7 +34,7 @@ Config file was signed successfully!
 
 Tips: <br>
 How to check SBL build python command?
-```
+```python
 def CmdSign(Args):
     print ("Args %s\n" % Args)
 ```
