@@ -50,11 +50,11 @@ PrintPostMessage (AmiTsePkg\EDK\MiniSetup\BootOnly\string.c)
 | BDS.HandoffToTse     |      |   V
 
 
-<span style="font-size:11px;">
-PS: 打V表示&lt;br&gt;<br>
+
+PS: 打V表示<br>
 1. stPostScreenActive被設為1。<br>
 2. gPostStatus被設為TSE_POST_STATUS_BEFORE_POST_SCREEN。<br>
-</span>
+
 
 <br>
 
