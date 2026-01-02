@@ -42,15 +42,11 @@ PrintPostMessage (AmiTsePkg\EDK\MiniSetup\BootOnly\string.c)
 	}
 ```
 
-"stPostScreenActive"的設定在VGA vs NON-VGA的環境下，有設定時序的差異。
-
 <br>
 
-
 PS: 打V表示<br>
-1. stPostScreenActive被設為1。***<br>
-2. gPostStatus設為TSE_POST_STATUS_BEFORE_POST_SCREEN。<br>
-3. Debug log: putty_NON_VGA_TSE.log/putty_VGA_TSE.log<br>
+1. stPostScreenActive被設為1。<br>
+2. gPostStatus被設為TSE_POST_STATUS_BEFORE_POST_SCREEN。<br>
 
 |                      | VGA             | NON-VGA |
 | :-----------------   | :-------------: | :--------------:
@@ -60,6 +56,8 @@ PS: 打V表示<br>
 <br>
 
 ## Root cause
+"stPostScreenActive"的設定在VGA vs NON-VGA的環境下，有設定時序的差異。
+
 在NON-VGA環境下，AMITSE會在POST快結束時才將gPostStatus設為"TSE_POST_STATUS_BEFORE_POST_SCREEN"並且設定<br>
 "stPostScreenActive"為1，當此條件滿足後，使用pAmiPostMgr->DisplayPostMessage()服務的文字，才能從console端輸出。<br>
 相較於VGA環境，AMITSE在VGA driver start後，就會打開"stPostScreenActive"為1，pAmiPostMgr->DisplayPostMessage()就會啟動。<br>
