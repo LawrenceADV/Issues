@@ -20,9 +20,83 @@
 
 <br>
 
-## 靈魂拷問系列
+## Investigation
 
-## 拷問一 : F202測試結果+J103 [BMC VGA]<br>
+## AMITSE
+
+BIOS在Disable Block SID [enable]後，會透過AMITSE提供的服務往螢幕與console端丟訊息!
+
+"DisplayPostMessage"會判斷"stPostScreenActive"，決定文字面能否往螢幕與console端丟。
+
+```cpp
+    pAmiPostMgr->DisplayPostMessage( String );
+```
+
+PrintPostMessage (AmiTsePkg\EDK\MiniSetup\BootOnly\string.c)
+```cpp
+	if(stPostScreenActive)
+	{
+		FlushLines(stStartLine,stNextLine+LineCount);
+		DoRealFlushLines();
+        MouseRefresh();
+	}
+```
+
+"stPostScreenActive"的設定在VGA vs NON-VGA的環境下，有設定時序的差異。
+
+<br>
+
+
+***PS: 打V表示***<br>
+***1. remote console可以看到AMI signon string。***<br>
+***2. gPostStatus設為TSE_POST_STATUS_BEFORE_POST_SCREEN。***<br>
+***3. Debug log: putty_NON_VGA_TSE.log/putty_VGA_TSE.log***<br>
+
+|                      | VGA             | NON-VGA |
+| :-----------------   | :-------------: | :--------------:
+| BDS.ConnectVgaConOut | V    | 
+| BDS.HandoffToTse     |      |   V
+
+<br>
+
+## Root cause
+在NON-VGA環境下，AMITSE會在POST快結束時才將gPostStatus設為"TSE_POST_STATUS_BEFORE_POST_SCREEN"並且設定<br>
+"stPostScreenActive"為1，當此條件滿足後，使用pAmiPostMgr->DisplayPostMessage()服務的文字，才能從console端輸出。<br>
+相較於VGA環境，AMITSE在VGA driver start後，就會打開"stPostScreenActive"為1，pAmiPostMgr->DisplayPostMessage()就會啟動。<br>
+
+## AMITSE的本意?
+為什麼NON-VGA環境下，AMITSE會在POST快結束時才將"stPostScreenActive"設為1?<br>
+
+推測是為了照顧到console redirection function，才將此flag設起來。
+
+
+## 解決方式
+
+NON-VGA環境下又要使用remote console丟字串，應該使用EDKII的服務。<br>
+
+```cpp
+gST->ConOut->OutputString(gST->ConOut, String);
+```
+
+MdePkg\Include\Uefi\UefiSpec.h<br>
+
+```cpp
+  ///
+  /// A pointer to the EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL interface
+  /// that is associated with ConsoleOutHandle.
+  ///
+  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL    *ConOut;
+```
+MdePkg\Include\Protocol\SimpleTextOut.h<br>
+
+```cpp
+EFI_TEXT_STRING                 OutputString;
+```
+<br>
+
+## 測試紀錄
+
+## 1. F202測試結果+J103 [BMC VGA]<br>
 
 <br>
 
@@ -35,7 +109,7 @@
 **測試畫面**<br>
 ![PASS_FAIL](./Pics/螢幕擷取畫面%202025-12-29%20094714.png)
 
-## 拷問二 : XL01測試結果+J103 [BMC VGA]<br>
+## 2. XL01測試結果+J103 [BMC VGA]<br>
 
 <br>
 
@@ -51,48 +125,21 @@
 
 結論:<br>
 1. Console端按壓F10無效，是因直接按F10 hot key，遠端會送出ESC給系統端的serial buffer，所以按第一次會看到畫面重整，第二次會進BIOS setup；遠端使用者必須想辦法送出正確F10 hot key給系統端的serial buffer。<br>
-2. AMI signon訊息與F10訊息出現順序和XL01不一致，和J103設定有關(參考拷問二)。<br>
+2. AMI signon訊息與F10訊息出現順序和XL01不一致，且不會主動出現，此現象和是否有VGA device有關。(測試2)<br>
 
+## 3. 為什麼系統有無VGA會影響remote端AMI signon和F10 message的行為?
 
-## 解決方式1 : 使用refresh來刷新putty畫面
+已知: <br>
+> AMI signon由commonoem.c輸出
 
-測試結果: 失敗<br>
-Compile不過
+<br>
 
-AmiModulePkg\Terminal\Terminal.sdl<br>
-```cpp
-TOKEN
-    Name  = "REFRESH_SCREEN_KEY"
-    Value  = "0x0012"
-    Help  = "Unicode Value of Key to Refresh the Screen.Default is set to Ctrl+r"
-    TokenType = Integer
-    TargetH = Yes
-End
-```
+### Debug message (XL01 debug log)
 
-AmiModulePkg\Terminal\TerminalSimpleTextIn.c <br>
+\\\biosserver.advantech.corp\upload\Lawrence.Guan\5993\debug\log\
+> putty_XL01_VGA.log<br>
+> putty_XL01_NON_VGA_NO_ESC.log<br>
+> putty_XL01_NON_VGA_WITH_ESC.log<br>
+> TSE debug\putty_NON_VGA_TSE.log<br>
+> TSE debug\putty_VGA_TSE.log<br>
 
-Check the Keyboard Data from Serial Port and Convert them 
-into proper Keyboard data. Once the Keyboard data is found added into 
-Keyboard Local buffer 
-~~~cpp
-EFI_STATUS
-CheckKeyboardDataFromSerial (
-    IN  TERMINAL_DEV *TerminalDev 
-)
-{
-    ...
-        // Refresh the Screen if CTRL + R or CTRL+ r key comes
-    // If UnicodeChar(REFRESH_SCREEN_KEY) is 0, it would disable RefreshScreen functionality
-    if((Status== EFI_SUCCESS) && (TerminalKey.Key.UnicodeChar != 0) && (TerminalKey.Key.UnicodeChar == RefreshScreenKey)) {
-        RefreshScreen();
-        // Don't report the CTRL+R or CTRL+r data.
-        return EFI_NOT_READY;
-    }
-}
-~~~
-
-## 解決方式2：在 HandleSIDPpi() 加入 gST->ConOut->ClearScreen (gST->ConOut)
-
-測試結果: 失敗<br>
-現象: POST code 0x92以後，遠端畫面清空，但訊息沒有出現。<br>
