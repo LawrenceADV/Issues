@@ -47,10 +47,10 @@ PrintPostMessage (AmiTsePkg\EDK\MiniSetup\BootOnly\string.c)
 <br>
 
 
-***PS: 打V表示***<br>
-***1. remote console可以看到AMI signon string。***<br>
-***2. gPostStatus設為TSE_POST_STATUS_BEFORE_POST_SCREEN。***<br>
-***3. Debug log: putty_NON_VGA_TSE.log/putty_VGA_TSE.log***<br>
+PS: 打V表示<br>
+1. stPostScreenActive被設為1。***<br>
+2. gPostStatus設為TSE_POST_STATUS_BEFORE_POST_SCREEN。<br>
+3. Debug log: putty_NON_VGA_TSE.log/putty_VGA_TSE.log<br>
 
 |                      | VGA             | NON-VGA |
 | :-----------------   | :-------------: | :--------------:
