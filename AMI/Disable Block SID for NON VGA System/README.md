@@ -44,7 +44,7 @@ PrintPostMessage (AmiTsePkg\EDK\MiniSetup\BootOnly\string.c)
 
 <br>
 
-|                      | VGA             | NON-VGA |
+|                      | ConOut             | NO ConOut |
 | :-----------------   | :-------------: | :--------------:
 | BDS.ConnectVgaConOut | V    | 
 | BDS.HandoffToTse     |      |   V
