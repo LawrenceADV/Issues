@@ -144,3 +144,7 @@ EFI_TEXT_STRING                 OutputString;
 > TSE debug\putty_NON_VGA_TSE.log<br>
 > TSE debug\putty_VGA_TSE.log<br>
 
+## Something need to know
+
+1. pAmiPostMgr服務何時啟動?<br>
+2. 為何上述現象，在按壓ESC重整畫面後，訊息可以出現?<br>
