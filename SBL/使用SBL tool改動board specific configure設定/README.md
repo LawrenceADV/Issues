@@ -19,7 +19,9 @@ python D:\SBL\slimbootloader\BootloaderCorePkg\Tools\CfgDataTool.py export -i Ou
 
 Open the GUI interface. After launching, Load YAML using the following YAML file: CfgDataDef.yaml. Then Load Config Data from binary using CfgDataExt_1E.bin.
 
+```
 python D:\SBL\slimbootloader\BootloaderCorePkg\Tools\ConfigEditor.py
+```
 
 Outputs\rplp\CfgDataDef.yaml
 
