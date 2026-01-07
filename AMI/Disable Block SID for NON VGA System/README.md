@@ -59,7 +59,7 @@ PS: 打V表示<br>
 <br>
 
 ## Root cause
-"stPostScreenActive"的設定在VGA vs NON-VGA的環境下，有設定時序的差異。
+"stPostScreenActive"的設定在ConOut vs NO ConOut的環境下，有設定時序的差異。
 
 在NON-VGA環境下，AMITSE會在POST快結束時才將gPostStatus設為"TSE_POST_STATUS_BEFORE_POST_SCREEN"並且設定<br>
 "stPostScreenActive"為1，當此條件滿足後，使用pAmiPostMgr->DisplayPostMessage()服務的文字，才能從console端輸出。<br>
