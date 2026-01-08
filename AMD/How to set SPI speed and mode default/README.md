@@ -82,25 +82,26 @@ the dummy cycle number of SPI Rom.
 5. Program UseSpi100 to 1 in FCH::LPCHOSTSPIREG::SPI100ENABLE_REGISTER.
 6. Program PrefetchEnSPIFromHost in FCH::LPCPCICFG::HOSTCONTROL to enable read prefetch.
 
+<br>
 
-BIOS會在 
+BIOS會在 <br>
 1. PEI設定SPI speed
- FCH::LPCHOSTSPIREG::SPI100ENABLE_REGISTER
-0x11310713
+ FCH::LPCHOSTSPIREG::SPI100ENABLE_REGISTER<br>
+0x11310713<br>
+<br>
+Lawrence::: FchInitResetSpi 116<br>
+AGESA_TP:[B000AF43]<br>
+Lawrence::: SPI_BASE=FEC10000<br>
+Lawrence::: REG22 SpiSpeed=1131<br>
+Lawrence::: REG20 WriteSpeed=713<br>
+Lawrence::: LocalCfgPtr->SpiTpmSpeed=0<br>
+Lawrence::: FchInitResetSpi 189<br>
+把new SPI100 speed設為33.33<br>
 
-Lawrence::: FchInitResetSpi 116
-AGESA_TP:[B000AF43]
-Lawrence::: SPI_BASE=FEC10000
-Lawrence::: REG22 SpiSpeed=1131
-Lawrence::: REG20 WriteSpeed=713
-Lawrence::: LocalCfgPtr->SpiTpmSpeed=0
-Lawrence::: FchInitResetSpi 189
-把new SPI100 speed設為33.33
+#new SPI100 engine.<br>
+#old SPI100 engine.<br>
 
-#new SPI100 engine.
-#old SPI100 engine.
-
-Q: what's SPI100 engine? new vs old?
+Q: what's SPI100 engine? new vs old?<br>
 
 2. DxeSmmReadyToLockRaCallback，將SPI mmio configuration space鎖上
 
