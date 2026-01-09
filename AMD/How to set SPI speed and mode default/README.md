@@ -63,10 +63,12 @@ gEfiAmdAgesaModulePkgTokenSpaceGuid.PcdResetFastSpeed<br>
 
 **2. 進入BIOS**
 
-The SPI configuration registers are accessed through SPI base address specified by 
+Refer 57228 (PPR Vol 7 for AMD Family 19h Model A0h A2)<br>
+The SPI configuration registers are accessed through SPI base address specified by<br>
+
 **FCH::LPCPCICFG::SPI_BASE_ADDR**.<br>
 
-![PASS_FAIL](./Pics/螢幕擷取畫面%202026-01-06%20232240.jpg)
+![PASS_FAIL](./Pics/螢幕擷取畫面%202026-01-09%20102556.png)
 
 <br>
 <br>
@@ -89,6 +91,10 @@ BIOS會在 <br>
  FCH::LPCHOSTSPIREG::SPI100ENABLE_REGISTER<br>
 0x11310713<br>
 <br>
+
+
+把new SPI100 speed設為33.33<br>
+
 ```
 Lawrence::: FchInitResetSpi 116
 AGESA_TP:[B000AF43]
@@ -97,7 +103,6 @@ Lawrence::: REG22 SpiSpeed=1131
 Lawrence::: REG20 WriteSpeed=713
 Lawrence::: LocalCfgPtr->SpiTpmSpeed=0
 Lawrence::: FchInitResetSpi 189
-把new SPI100 speed設為33.33
 ```
 
 #new SPI100 engine.<br>
@@ -105,21 +110,8 @@ Lawrence::: FchInitResetSpi 189
 
 Q: what's SPI100 engine? new vs old?<br>
 
-2. DxeSmmReadyToLockRaCallback，將SPI mmio configuration space鎖上
+2. DxeSmmReadyToLockRaCallback，用 "PcdRomArmorEnable" 將SPI mmio configuration space鎖上。
 
-```cpp
-PcdMapping
-    Name  = "PcdRomArmorEnable"
-    GuidSpace  = "gAmiPspPkgTokenSpaceGuid"
-    PcdType  = "PcdsFixedAtBuild"
-    DataType  = "Boolean"
-    Value  = "TRUE"
-    Offset  = 00h
-    Length  = 01h
-    TargetDSC = Yes
-    Token = "PSP_CRISIS_RECOVERY_SUPPORT" "=" "0"
-End
-```
 ```
 --- SPI_Flash_Ready_To_Lock callback ---
 --- Spi settings start(89) ---
@@ -140,25 +132,13 @@ C0 14 08 46 03 00 00 00 FC FC FC FC FC 88 00 00
 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
 00 00 00 00 00 00 00 00 00 00 00 00 10 00 00 00 
 --- Spi settings end ---
-
-Installing R/A communication protocol
-SmmInstallProtocolInterface: 346B138A-D825-4AC0-B919-46169ABADD4D ACD6B218
---- Spi settings start(Success 204) ---
-FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF 
-FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF 
-FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF 
-FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF 
-FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF 
-FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF 
-FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF 
-FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF 
-FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF 
-FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF 
-FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF 
-FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF 
-FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF 
-FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF 
-FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF 
-FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF 
---- Spi settings end ---
 ```
+
+## 測試
+
+PcdRomArmorEnable[FALSE]
+
+進入 0xFEC10000 對 FCH::LPCHOSTSPIREG::SPI100ENABLE_REGISTER::tpmspeed[19:16] 調整SPI 速度<br>
+
+
+![PASS_FAIL](./Pics/SPI速度量測實驗.jpg)
