@@ -136,6 +136,10 @@ SPI100ENABLE_REGISTER = 0x2131_0713
 
 \\biosserver.advantech.corp\Upload\Lawrence.Guan\E781\SPI\log\putty_PcdResetSpiSpeed[02].log<br>
 
+**1.4 針對每個SPI SPEED，開出對應選項**
+
+目標：釐清Normal speed/Alt speed/Tpm Speed的使用情境
+
 
 **2. 手動調整**
 進入 0xFEC10000 對 FCH::LPCHOSTSPIREG::SPI100ENABLE_REGISTER::tpmspeed[19:16] 調整SPI 速度<br>
