@@ -2,92 +2,77 @@
 
 **Platform: AMD SIENA**
 
-**1. Modify the PSP EFS table**
+**1. Pre-knowledge should know**
 
-**Chapter 3.4.16 (58289_1.20_NDA.pdf)**
+**1.1 AGESA Boot Flow**
 
-***PSP firmware 
+58203_1.00 Siena SP6 Platform Firmware Training
+(Page 20)
+
+
+**2. Modify the PSP EFS table**
+
+**2.1 Chapter 3.4.16 (58289_1.20_NDA.pdf)**
+
+PSP firmware 
 will configure SPI ReadMode and FastSpeed if the data of EFS offset 0x47/0x48/0x49 are valid 
-values.***
+values.
 
-Q: 什麼叫做Valid values?<br>
+Q: Valid values?<br>
 
-spec的定義是**符合AMD datasheet定義的SpiReadMode/SpiFastSpeed值**否則"do nothing"<br>
+符合datasheet定義的SpiReadMode/SpiFastSpeed值否則"do nothing"<br>
 
-![PASS_FAIL](./Pics/offset_47_48.jpg)
+![EFS_OFF_47_48](./Pics/offset_47_48.jpg)
 
 BIOS 的設定 token如下，default全為0xFF為do nothing的設定。
-```cpp
-TOKEN
-    Name  = "SPI_MODE"
-    Value  = "0xFFFFFFFF"
-    Help  = "Byte3 (EFS offset 0x47) for SPI Mode"
-    TokenType = Integer
-    TargetEQU = Yes
-    TargetMAK = Yes
-    TargetH = Yes
-End
 
-TOKEN
-    Name  = "SPI_SPEED"
-    Value  = "0xFFFFFFFF"
-    Help  = "Byte0 (EFS offset 0x48) for SPI Speed, Byte1 (EFS offset 0x49) for MicroDetectFlag"
-    TokenType = Integer
-    TargetEQU = Yes
-    TargetMAK = Yes
-    TargetH = Yes
-End
-```
+- SPI_MODE=0xFFFFFFFF
+- SPI_SPEED=0xFFFFFFFF
 
-Binary<br>
+<br>
 
-參考 Doc#57299 - AMD Platform Security 
+**2.2 Binary**
+
+Refer Doc#57299 - AMD Platform Security 
 Processor BIOS 
 Implementation Guide for 
 Server EPYC Processors<br>
 
 - 0x55AA55AA是PSP用來識別EFS table的signature
-- Family 19h Models 10h–1Fh onward: **Only one EFS is supported. It is at offset 0x20000.**
-- PcdResetMode和PcdResetFastSpeed不用理會?<br>
-From Chapter 3.4.16 (58289_1.20_NDA.pdf) :<br>
-There are two PCD tokens related with SPI ReadMode and FastSpeedNew settings.<br> 
+
+- Family 19h Models 10h–1Fh onward: **Only one EFS is supported.** It is at offset **0x20000.**
+
+- There are two PCD tokens related with SPI ReadMode and FastSpeedNew settings.<br> 
 FCH code will not consume these tokens to configure SPI in PEI phase to avoid FCH override 
 PSP firmware settings.<br>
-gEfiAmdAgesaModulePkgTokenSpaceGuid.PcdResetMode<br>
-gEfiAmdAgesaModulePkgTokenSpaceGuid.PcdResetFastSpeed<br>
 
-![PASS_FAIL](./Pics/binary.jpg)
+    Refer Chapter 3.4.16 (58289_1.20_NDA.pdf) :<br>
+
+    ```
+    gEfiAmdAgesaModulePkgTokenSpaceGuid.PcdResetMode
+    gEfiAmdAgesaModulePkgTokenSpaceGuid.PcdResetFastSpeed
+    ```
+
+    ![Binary](./Pics/binary.jpg)
+
 
 <br>
 <br>
 
-**2. 進入BIOS**
+**3. BIOS**
 
-Refer 57228 (PPR Vol 7 for AMD Family 19h Model A0h A2)<br>
-The SPI configuration registers are accessed through SPI base address specified by<br>
 
-**FCH::LPCPCICFG::SPI_BASE_ADDR**.<br>
+**3.1 The SPI configuration registers are accessed through SPI base address specified by FCH::LPCPCICFG::SPI_BASE_ADDR**.
 
+Refer 57228 (PPR Vol 7 for AMD Family 19h Model A0h A2)
 ![PASS_FAIL](./Pics/螢幕擷取畫面%202026-01-09%20102556.png)
 
-<br>
-<br>
-<br>
-<br>
+**3.2 Agesa**
 
-Change Rom Read mode/Speed:
-1. Rom read is handled by old Spi engine first which running 16.7M without prefetch enabled.
-2. Program FCH::LPCHOSTSPIREG::SPI_CNTRL0_REGISTER to set up Read mode.
-3. Program dummy cycle in FCH::LPCHOSTSPIREG::SPI100_DUMMY_CYCLE_CONFIG_REGISTER to match
-the dummy cycle number of SPI Rom.
-4. Program speed for all operations in FCH::LPCHOSTSPIREG::SPI100ENABLE_REGISTER.
-5. Program UseSpi100 to 1 in FCH::LPCHOSTSPIREG::SPI100ENABLE_REGISTER.
-6. Program PrefetchEnSPIFromHost in FCH::LPCPCICFG::HOSTCONTROL to enable read prefetch.
+AgesaModulePkg\AgesaModuleFchPkg.dec
 
-<br>
 
-BIOS會在 <br>
-1. PEI設定SPI speed
+- PEI設定SPI speed
  FCH::LPCHOSTSPIREG::SPI100ENABLE_REGISTER<br>
 0x11310713<br>
 <br>
@@ -95,22 +80,13 @@ BIOS會在 <br>
 
 把new SPI100 speed設為33.33<br>
 
-```
-Lawrence::: FchInitResetSpi 116
-AGESA_TP:[B000AF43]
-Lawrence::: SPI_BASE=FEC10000
-Lawrence::: REG22 SpiSpeed=1131
-Lawrence::: REG20 WriteSpeed=713
-Lawrence::: LocalCfgPtr->SpiTpmSpeed=0
-Lawrence::: FchInitResetSpi 189
-```
 
 #new SPI100 engine.<br>
 #old SPI100 engine.<br>
 
 Q: what's SPI100 engine? new vs old?<br>
 
-2. DxeSmmReadyToLockRaCallback，用 "PcdRomArmorEnable" 將SPI mmio configuration space鎖上。
+**3.2 DxeSmmReadyToLockRaCallback，用 "PcdRomArmorEnable" 將SPI mmio configuration space鎖上**
 
 ```
 --- SPI_Flash_Ready_To_Lock callback ---
@@ -136,9 +112,41 @@ C0 14 08 46 03 00 00 00 FC FC FC FC FC 88 00 00
 
 ## 測試
 
-PcdRomArmorEnable[FALSE]
+**1. PcdRomArmorEnable[FALSE]**
 
+修改AgesaModulePkg\AgesaModuleFchPkg.dec定義的PcdResetSpiSpeed，觀察暫存器變化。
+
+**1.1 PcdResetSpiSpeed[0x00]**
+
+SPI100ENABLE_REGISTER = 0x3131_0713
+
+\\biosserver.advantech.corp\Upload\Lawrence.Guan\E781\SPI\log\putty_PcdResetSpiSpeed[00].log<br>
+
+**1.2 PcdResetSpiSpeed[0x01]**
+
+SPI100ENABLE_REGISTER = 0x0131_0713
+
+System Hang at A915.
+
+\\biosserver.advantech.corp\Upload\Lawrence.Guan\E781\SPI\log\putty_PcdResetSpiSpeed[01].log<br>
+
+**1.3 PcdResetSpiSpeed[0x03]**
+
+SPI100ENABLE_REGISTER = 0x2131_0713
+
+\\biosserver.advantech.corp\Upload\Lawrence.Guan\E781\SPI\log\putty_PcdResetSpiSpeed[02].log<br>
+
+
+**2. 手動調整**
 進入 0xFEC10000 對 FCH::LPCHOSTSPIREG::SPI100ENABLE_REGISTER::tpmspeed[19:16] 調整SPI 速度<br>
 
-
 ![PASS_FAIL](./Pics/SPI速度量測實驗.jpg)
+
+**3. Datasheet 描述 Change SPI ROM Read mode/Speed:**
+1. Rom read is handled by old Spi engine first which running 16.7M without prefetch enabled.
+2. Program FCH::LPCHOSTSPIREG::SPI_CNTRL0_REGISTER to set up Read mode.
+3. Program dummy cycle in FCH::LPCHOSTSPIREG::SPI100_DUMMY_CYCLE_CONFIG_REGISTER to match
+the dummy cycle number of SPI Rom.
+1. Program speed for all operations in FCH::LPCHOSTSPIREG::SPI100ENABLE_REGISTER.
+2. Program UseSpi100 to 1 in FCH::LPCHOSTSPIREG::SPI100ENABLE_REGISTER.
+3. Program PrefetchEnSPIFromHost in FCH::LPCPCICFG::HOSTCONTROL to enable read prefetch.
