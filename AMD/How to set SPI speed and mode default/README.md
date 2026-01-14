@@ -55,12 +55,9 @@ PSP firmware settings.<br>
 
     ![Binary](./Pics/binary.jpg)
 
-
-<br>
 <br>
 
 **3. BIOS**
-
 
 **3.1 Agesa**
 
