@@ -1,4 +1,4 @@
-# How to set SPI speed and mode default
+# How to set SPI READ speed default
 
 **Platform: AMD SIENA**
 
@@ -62,31 +62,18 @@ PSP firmware settings.<br>
 **3. BIOS**
 
 
-**3.1 The SPI configuration registers are accessed through SPI base address specified by FCH::LPCPCICFG::SPI_BASE_ADDR**.
-
-Refer 57228 (PPR Vol 7 for AMD Family 19h Model A0h A2)
-![PASS_FAIL](./Pics/螢幕擷取畫面%202026-01-09%20102556.png)
-
-**3.2 Agesa**
+**3.1 Agesa**
 
 AgesaModulePkg\AgesaModuleFchPkg.dec
 
+- PEI設定 FCH::LPCHOSTSPIREG::SPI100ENABLE_REGISTER::normspeed[31:28]
+- 單獨設定此暫存器無法固定SPI speed.
 
-- PEI設定SPI speed
- FCH::LPCHOSTSPIREG::SPI100ENABLE_REGISTER<br>
-0x11310713<br>
 <br>
 
+**3.2 DxeSmmReadyToLockRaCallback，AMI依據"PcdRomArmorEnable"，決定是否將SPI mmio configuration space鎖上。**
 
-把new SPI100 speed設為33.33<br>
-
-
-#new SPI100 engine.<br>
-#old SPI100 engine.<br>
-
-Q: what's SPI100 engine? new vs old?<br>
-
-**3.2 DxeSmmReadyToLockRaCallback，用 "PcdRomArmorEnable" 將SPI mmio configuration space鎖上**
+PcdRomArmorEnable[FALSE]，RU下可看見SPI mmio configuration space(FEC1_0000)的值
 
 ```
 --- SPI_Flash_Ready_To_Lock callback ---
@@ -110,47 +97,36 @@ C0 14 08 46 03 00 00 00 FC FC FC FC FC 88 00 00
 --- Spi settings end ---
 ```
 
+<br>
+
+## 示波器量到的值，對應SPI100ENABLE_REGISTER的哪一個Speed?
+
 ## 測試
 
-**1. PcdRomArmorEnable[FALSE]**
+**1 統一將 SPI100ENABLE_REGISTER**
 
-修改AgesaModulePkg\AgesaModuleFchPkg.dec定義的PcdResetSpiSpeed，觀察暫存器變化。
+normspeed<br>
+fastspeednew<br>
+altspeednew<br>
+tpmspeed<br>
+設為16.66MHZ<br>
 
-**1.1 PcdResetSpiSpeed[0x00]**
+FchInitResetSpi()<br>
+```
+  (*(volatile UINT8*)(UINTN)(SPI_BASE+0x22)) = 0x33;
+  (*(volatile UINT8*)(UINTN)(SPI_BASE+0x23)) = 0x33;
+```
 
-SPI100ENABLE_REGISTER = 0x3131_0713
+量測結果:<br>
+- ABL = 16.66MHZ : 目前觀察到ABL會固定在此速度，修改PSP設定無法生效。
+- BIOS = 16.66MHZ : 此速度符合預期。
+- AFU flash BIOS = 16.66MHZ : 此速度符合預期。
 
-\\biosserver.advantech.corp\Upload\Lawrence.Guan\E781\SPI\log\putty_PcdResetSpiSpeed[00].log<br>
-
-**1.2 PcdResetSpiSpeed[0x01]**
-
-SPI100ENABLE_REGISTER = 0x0131_0713
-
-System Hang at A915.
-
-\\biosserver.advantech.corp\Upload\Lawrence.Guan\E781\SPI\log\putty_PcdResetSpiSpeed[01].log<br>
-
-**1.3 PcdResetSpiSpeed[0x03]**
-
-SPI100ENABLE_REGISTER = 0x2131_0713
-
-\\biosserver.advantech.corp\Upload\Lawrence.Guan\E781\SPI\log\putty_PcdResetSpiSpeed[02].log<br>
-
-**1.4 針對每個SPI SPEED，開出對應選項**
-
-目標：釐清Normal speed/Alt speed/Tpm Speed的使用情境
-
+<br>
 
 **2. 手動調整**
 進入 0xFEC10000 對 FCH::LPCHOSTSPIREG::SPI100ENABLE_REGISTER::tpmspeed[19:16] 調整SPI 速度<br>
 
 ![PASS_FAIL](./Pics/SPI速度量測實驗.jpg)
 
-**3. Datasheet 描述 Change SPI ROM Read mode/Speed:**
-1. Rom read is handled by old Spi engine first which running 16.7M without prefetch enabled.
-2. Program FCH::LPCHOSTSPIREG::SPI_CNTRL0_REGISTER to set up Read mode.
-3. Program dummy cycle in FCH::LPCHOSTSPIREG::SPI100_DUMMY_CYCLE_CONFIG_REGISTER to match
-the dummy cycle number of SPI Rom.
-1. Program speed for all operations in FCH::LPCHOSTSPIREG::SPI100ENABLE_REGISTER.
-2. Program UseSpi100 to 1 in FCH::LPCHOSTSPIREG::SPI100ENABLE_REGISTER.
-3. Program PrefetchEnSPIFromHost in FCH::LPCPCICFG::HOSTCONTROL to enable read prefetch.
+![PASS_FAIL](./Pics/SPI_CLK.png)
