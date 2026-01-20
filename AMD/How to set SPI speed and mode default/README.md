@@ -120,10 +120,3 @@ FchInitResetSpi()<br>
 - AFU flash BIOS = 16.66MHZ : 此速度符合預期。
 
 <br>
-
-**2. 手動調整**
-進入 0xFEC10000 對 FCH::LPCHOSTSPIREG::SPI100ENABLE_REGISTER::tpmspeed[19:16] 調整SPI 速度<br>
-
-![PASS_FAIL](./Pics/SPI速度量測實驗.jpg)
-
-![PASS_FAIL](./Pics/SPI_CLK.png)

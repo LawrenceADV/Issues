@@ -1,0 +1,1 @@
+\\biosserver.advantech.corp\upload\Lawrence.Guan\6884\39144\Fintek_Read_ChipID.py
