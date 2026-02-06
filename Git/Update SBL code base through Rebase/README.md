@@ -30,17 +30,15 @@ git.exe pull --progress -v --no-rebase -- "origin"
 - fork 是Advgcipc repository
 - 在 local 測試升版結果，不用 push 到 origin
 
-#### 切換開發分支
+#### 切換開發分支並建立備份
 ```
 git checkout SOM-6884A2
 ```
-
-#### 建立備份
 ```
 git branch som-6884A2-Backup
 ```
 
-#### Rebase到要升級的版本
+#### 開始 Rebase 到要升級的版本
 ```
 git rebase 0576ef337442c2ba5758e6117a05ba03b6116a7b
 ```
@@ -58,14 +56,17 @@ git會從SOM-6884A2一版一版導入(V101 -> V102 -> V103 ...)
 ![CfgDataTool_Export_Help](./Pics/螢幕擷取畫面%202026-02-05%20110226.jpg)
 
 
-選擇 ours vs theirs
+#### 選擇 ours vs theirs
 
 ![CfgDataTool_Export_Help](./Pics/螢幕擷取畫面%202026-02-05%20111239.jpg)
 
-選擇ours
+#### 選擇ours
 
 ![CfgDataTool_Export_Help](./Pics/螢幕擷取畫面%202026-02-05%20134115.jpg)
 
+### Final
+
+![CfgDataTool_Export_Help](./Pics/螢幕擷取畫面%202026-02-06%20101900.jpg)
 
 ### 3. 探討
 
@@ -79,5 +80,5 @@ AI:
 3. 策略的針對性： 即使你設定了「選 ours」的策略，這也只會影響到發生衝突（Conflict）的檔案；對於那些沒有衝突的改動，Git 依然會依照正常邏輯自動合併，並保留其他新增的檔案內容
 
 
-### Final
+
 
